@@ -1,0 +1,98 @@
+{% extends "search_index/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <form method="get" action="{% url 'search_index:simple_search' %}" class="form-inline mb-4">
+        <input type="text" name="query" maxlength="100" value="{{ query|default:'' }}" placeholder="请输入搜索关键词" class="form-control mr-sm-2">
+        <button class="btn btn-primary" type="submit">搜索</button>
+    </form>
+
+    {% if query %}
+        <p>您当前的 IP 地址是: {{ client_ip }}</p>
+        <h2>搜索关键词: "{{ query }}"</h2>
+        <h3>搜索结果: 共 {{ total }} 条</h3>
+
+        <ul id="results-list">
+            <!-- 动态加载结果 -->
+        </ul>
+
+        {% if pages > 1 %}
+            <nav>
+                <ul class="pagination">
+                    <!-- 上一页 -->
+                    {% if current_page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="?query={{ query }}&page={{ current_page|add:"-1" }}">上一页</a>
+                        </li>
+                    {% endif %}
+
+                    <!-- 分页范围 -->
+                    {% for i in pagination_range %}
+                        <li class="page-item {% if i == current_page %}active{% endif %}">
+                            <a class="page-item" href="?query={{ query }}&page={{ i }}">{{ i }}</a>
+                        </li>
+                    {% endfor %}
+
+                    <!-- 下一页 -->
+                    {% if current_page < pages %}
+                        <li class="page-item">
+                            <a class="page-link" href="?query={{ query }}&page={{ current_page|add:"1" }}">下一页</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% endif %}
+</div>
+
+{% block extra_styles %}
+<style>
+    .search-result-box {
+        cursor: pointer; /* 鼠标悬停时显示为手型 */
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        transition: background-color 0.3s ease;
+    }
+
+    .search-result-box:hover {
+        background-color: #f0f0f0;
+    }
+
+    .search-result-box p {
+        margin: 5px 0;
+    }
+
+    /* 添加封面图片的样式 */
+    .search-result-box img {
+        max-width: 100%; /* 保证图片不超出宽度 */
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const key = '{{ key|safe }}'; // 从模板中获取密钥
+    const results = JSON.parse('{{ results|safe|escapejs }}'); // 从模板中获取加密的结果数据
+    const resultsList = document.getElementById('results-list');
+    const keyData = Uint8Array.from(atob(key), c => c.charCodeAt(0)); // Base64解码密钥并转换为Uint8Array格式
+    const cryptoKey = await crypto.subtle.importKey('raw', keyData, { name: 'AES-GCM' }, false, ['decrypt']); // 导入密钥用于解密
+    const decryptResults = async () => {
+        for (let result of results) {
+            const encryptedData = Uint8Array.from(atob(result), c => c.charCodeAt(0)); // Base64解码加密的数据并转换为Uint8Array格式
+            const decryptedData = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: keyData }, cryptoKey, encryptedData); // 解密数据
+            const decryptedText = new TextDecoder().decode(decryptedData); // 将解密后的二进制数据转换为字符串
+            const li = document.createElement('li');
+            li.innerHTML = decryptedText; // 设置解密后的内容到列表项中
+            resultsList.appendChild(li); // 将列表项添加到结果列表中
+        }
+    };
+    decryptResults(); // 调用解密函数处理结果数据
+});
+</script>
+{% endblock %}
+{% endblock %}

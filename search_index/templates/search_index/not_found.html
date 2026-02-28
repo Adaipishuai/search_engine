@@ -1,0 +1,18 @@
+{% extends "search_index/base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="container error-page">
+        <h1>错误</h1>
+        <p>请返回主页。</p>
+        <a href="{% url 'search_index:index' %}" class="btn btn-primary">返回主页</a>
+    </div>
+</body>
+</html>
+
+{% endblock %}

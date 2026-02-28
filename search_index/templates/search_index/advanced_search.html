@@ -1,0 +1,145 @@
+{% extends "search_index/base.html" %}
+
+{% block content %}
+<div class="container mt-3">
+    <!-- 折叠按钮 -->
+    <button class="btn btn-primary mb-3" type="button" data-toggle="collapse" data-target="#advancedSearchForm" aria-expanded="false" aria-controls="advancedSearchForm">
+        高级搜索
+    </button>
+
+    <!-- 折叠的搜索表单 -->
+    <div class="collapse" id="advancedSearchForm">
+        <div class="card card-body">
+            <form method="get" action="{% url 'search_index:advanced_search' %}">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="query">关键词</label>
+                        <input type="text" id="query" name="query" class="form-control" placeholder="请输入关键词">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="authors">作者</label>
+                        <input type="text" id="authors" name="authors" class="form-control" placeholder="请输入作者名">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="tags">标签</label>
+                        <input type="text" id="tags" name="tags" class="form-control" placeholder="请输入标签">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="click_min">点击量最小值</label>
+                        <input type="number" id="click_min" name="click_min" class="form-control" placeholder="最小点击量">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="click_max">点击量最大值</label>
+                        <input type="number" id="click_max" name="click_max" class="form-control" placeholder="最大点击量">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-3">
+                        <label for="char_min">字数最小值</label>
+                        <input type="number" id="char_min" name="char_min" class="form-control" placeholder="最小字数">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="char_max">字数最大值</label>
+                        <input type="number" id="char_max" name="char_max" class="form-control" placeholder="最大字数">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">搜索</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if results %}
+    <p>您当前的 IP 地址是: {{ client_ip }}</p>
+    <h3>搜索结果 (共 {{ total }} 条):</h3>
+
+    <ul class="result-list">
+        {% for result in results %}
+        <li>
+            <div class="search-result-box" onclick="window.location.href='{% url 'search_index:book_detail' book_id=result.source.book_id %}'">
+                <div class="row">
+                    <!-- 左侧封面图片 -->
+                    <div class="col-md-3">
+                        <img src="{{ result.source.cover }}" alt="封面" class="img-fluid rounded" style="max-height: 150px; object-fit: cover;">
+                    </div>
+                    <!-- 右侧内容 -->
+                    <div class="col-md-9">
+                        {% if result.highlight %}
+                            <p class="highlighted-result">匹配结果: {{ result.highlight|safe }}</p>
+                        {% endif %}
+                        <p><strong>书名:</strong> {{ result.source.bookName }}</p>
+                        <p><strong>作者:</strong> {{ result.source.authors }}</p>
+
+                    </div>
+                </div>
+            </div>
+            <div class="separator"></div>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <nav>
+        <ul class="pagination">
+            {% if pages > 1 %}
+            <!-- 上一页 -->
+            {% if current_page > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="?query={{ query }}&page={{ current_page|add:"-1" }}">上一页</a>
+            </li>
+            {% endif %}
+
+            <!-- 分页范围 -->
+            {% for i in pagination_range %}
+            <li class="page-item {% if i == current_page %}active{% endif %}">
+                <a class="page-link" href="?query={{ query }}&page={{ i }}">{{ i }}</a>
+            </li>
+            {% endfor %}
+
+            <!-- 下一页 -->
+            {% if current_page < pages %}
+            <li class="page-item">
+                <a class="page-link" href="?query={{ query }}&page={{ current_page|add:"1" }}">下一页</a>
+            </li>
+            {% endif %}
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}
+
+{% block extra_styles %}
+<style>
+    .search-result-box {
+        cursor: pointer; /* 鼠标悬停时显示为手型 */
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        transition: background-color 0.3s ease;
+    }
+
+    .search-result-box:hover {
+        background-color: #f0f0f0;
+    }
+
+    .search-result-box p {
+        margin: 5px 0;
+    }
+
+    /* 添加封面图片的样式 */
+    .search-result-box img {
+        max-width: 100%; /* 保证图片不超出宽度 */
+        border-radius: 5px;
+    }
+
+    /* 分隔符样式 */
+    .separator {
+        height: 1px;
+        background-color: #ddd;
+        margin: 10px 0;
+    }
+</style>
+{% endblock %}
+{% endblock %}

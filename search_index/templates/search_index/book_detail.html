@@ -1,0 +1,26 @@
+{% extends "search_index/base.html" %}
+{% block content %}
+    <div class="container mt-4">
+        <h2>书籍详情</h2>
+
+        <div class="book-detail">
+            <p><strong>书名:</strong> {{ book.bookName }}</p>
+            <p><strong>分类:</strong> {{ book.category }}</p>
+            <p><strong>字数:</strong> {{ book.count_char }}</p>
+
+            {% if book.cover %}
+                <p><strong>封面:</strong> <img src="{{ book.cover }}" alt="封面" width="200"></p>
+            {% endif %}
+
+            <p><strong>作者:</strong> {{ book.authors }}</p>
+            <p><strong>点击量:</strong> {{ book.count_click }}</p>
+            <p><strong>简介:</strong> {{ book.introduction }}</p>
+            <p><strong>来源链接:</strong> <a href="{{ book.sourceUrl }}" target="_blank">{{ book.sourceName }}</a></p>
+            <p><strong>状态:</strong> {{ book.status }}</p>
+            <p><strong>标签:</strong> {{ book.tag }}</p>
+            <p><strong>评分:</strong> {{ book.score }}</p>
+
+            <a href="javascript:window.history.back();">返回搜索结果</a>
+        </div>
+    </div>
+{% endblock %}

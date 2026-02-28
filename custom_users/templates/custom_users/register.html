@@ -1,0 +1,9 @@
+{% extends "search_index/base.html" %}
+{% block content %}
+<h2>注册</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">注册</button>
+</form>
+{% endblock %}

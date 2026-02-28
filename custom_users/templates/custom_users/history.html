@@ -1,0 +1,9 @@
+{% extends "search_index/base.html" %}
+{% block content %}
+<h2>我的搜索历史</h2>
+<ul>
+    {% for record in history %}
+    <li>{{ record.query }} - {{ record.timestamp }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

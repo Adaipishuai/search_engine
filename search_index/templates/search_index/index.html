@@ -1,0 +1,49 @@
+{% extends "search_index/base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <script src="https://api.suyanw.cn/api/mouse/yinghua.js"/></script>
+</head>
+<body>
+    <div class="jumbotron">
+        <h1 class="display-4">Hello,world</h1>
+        <p class="lead">xx😋xx</p>
+        <hr class="my-4">
+
+        <div class="row">
+
+        <div class="col">
+            <form method="get" action="{% url 'search_index:simple_search' %}" class="form-inline mb-4">
+                <input type="text" name="query" maxlength="100" id="formGroupExampleInput" placeholder="请输入搜索关键词" class="form-control mr-sm-2">
+                <button class="btn btn-primary" type="submit">搜索</button>
+            </form>
+        </div>
+
+        <div class="col">
+            <a class="btn btn-primary btn-lg" href="{% url 'search_index:advanced_search' %}" role="button">高级检索</a>
+        </div>
+
+
+        <div class="col">
+<a class="btn btn-primary btn-lg" href="{% url 'search_index:book_recommend' %}" role="button" target="_blank">看看推荐</a>
+        </div>
+
+    </div>
+
+
+        <div>
+            <img src="{{ img_url }}" title="每日图片" alt="每日图片" style="max-width: 100%; height: auto;"/>
+        </div>
+
+
+    </div>
+    <footer>
+        <p>&copy; 2024 My Search Engine</p>
+        <p>Co-encoding contact: <a href="mailto:<EMAIL>">2131935917@qq.com</a></p>
+    </footer>
+</body>
+</html>
+{% endblock content %}
